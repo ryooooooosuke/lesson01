@@ -3,7 +3,7 @@
     $db = Database::dbConnect();
 
     try {
-        $sql = 'CREATE TABLE post (
+        $sql = 'CREATE TABLE posts (
             id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             content VARCHAR(255) NOT NULL,
             create_date DATETIME,
