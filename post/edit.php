@@ -1,39 +1,35 @@
 <?php
-    require('../db_connect.php');
-    $db = dbConnect();
+    require_once('../Database.php');
+    require_once('../Utils.php');
+    require_once('./Post.php');
 
+    $db = Database::dbConnect();
     $id = $_GET['id'];
+
     if (empty($id)) {
         exit('IDが不正です');
     }
 
+    $Post = new Post($db);
+
     if (!empty($_POST['update'])) {
         try {
-            $content = $_POST['content'];
-            $sql = "UPDATE post SET content = :content WHERE id = :id";
-            //実行準備
-            $stmt = $db->prepare($sql);
-            $stmt->bindValue(':content', $content, PDO::PARAM_STR);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
+            $content = Utils::h($_POST['content']);
+            $Post->update($content, $id);
         } catch(PDOException $e) {
             echo $e->getMessage();
         }
     }
 
-    $id = $_GET['id'];
-    $stmt = $db->prepare('SELECT * FROM post WHERE id = :id');
-    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-    $stmt->execute();
-    $post = $stmt->fetch(PDO::FETCH_ASSOC);
+    $TargetPost = $Post->getById($id);
 
-    if (!$post) {
+    if (!$TargetPost) {
         exit('TODOが存在しません。');
     }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,7 +44,7 @@
             <h2 class="mx-auto">TODOアプリ</h2>
             <form action="" method="POST">
                 <div class="form-group">
-                    <textarea class="w-100" name="content" rows="3" value=""><?php echo $post['content']; ?></textarea>
+                    <textarea class="w-100" name="content" rows="3" value=""><?php echo $TargetPost['content']; ?></textarea>
                 </div>
                 <div class="text-center">
                     <a href="index.php" class="btn btn-secondary">戻る</a>

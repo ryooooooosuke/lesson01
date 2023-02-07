@@ -1,31 +1,24 @@
 <?php
-    require('../db_connect.php');
-    $db = dbConnect();
+    require_once('../Database.php');
+    require_once('../Utils.php');
+    require_once('./Post.php');
+
+    $db = Database::dbConnect();
+    $Post = new Post($db);
 
     if (!empty($_POST['submit_button'])) {
         try {
-            $content = $_POST['content'];
-            $stmt = $db->prepare('INSERT INTO post (content, update_date) VALUES (:content, now())');
-            $stmt->bindValue(':content', $content, PDO::PARAM_STR);
-            $stmt->execute();
+            $content = Utils::h($_POST['content']);
+            $Post->create($content);
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }
 
-    $posts = getPosts($db);
-
-    // TODO一覧を取得する。
-    function getPosts($db) {
-        $stmt = $db->prepare('SELECT id, content FROM post ORDER BY create_date DESC');
-        $stmt->execute();
-        $posts = $stmt->fetchALL(PDO::FETCH_ASSOC);
-
-        return $posts;
-    }
+    $Posts = $Post->getAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -47,7 +40,7 @@
                     <button type="submit" class="btn btn-primary" name="submit_button" value="1">作成</button>
                 </div>
             </form>
-            <?php if(!empty($posts)): ?>
+            <?php if(!empty($Posts)): ?>
                 <table class="table mt-5">
                     <thead>
                         <tr>
@@ -57,11 +50,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($posts as $post): ?>
+                        <?php foreach($Posts as $Post): ?>
                             <tr class="border-bottom">
-                                <td><?php echo $post['content']; ?></td>
-                                <td><a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-primary">編集</a></td>
-                                <td><a href="delete.php?id=<?php echo $post['id']; ?>" class="btn btn-danger">削除</a></td>
+                                <td><?php echo $Post['content']; ?></td>
+                                <td><a href="edit.php?id=<?php echo $Post['id']; ?>" class="btn btn-primary">編集</a></td>
+                                <td><a href="delete.php?id=<?php echo $Post['id']; ?>" class="btn btn-danger">削除</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -1,7 +1,11 @@
 <?php
-    require_once('env.php');
 
-    function dbConnect() {
+require_once('env.php');
+
+class Database
+{
+    public static function dbConnect() 
+    {
         $host = DB_HOST;
         $dbName = DB_NAME;
         $user = DB_USER;
@@ -16,4 +20,5 @@
         }
         return $db;
     }
+}
 ?>

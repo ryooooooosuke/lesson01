@@ -1,6 +1,8 @@
 <?php
-    require('../db_connect.php');
-    $db = dbConnect();
+    require_once('../Database.php');
+    require_once('./Post.php');
+
+    $db = Database::dbConnect();
 
     $id = $_GET['id'];
     if (empty($id)) {
@@ -9,10 +11,8 @@
 
     if ($id) {
         try {
-            $sql = "DELETE FROM post WHERE id = :id";
-            $stmt = $db-> prepare($sql);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
+            $Post = new Post($db);
+            $Post->delete($id);
         } catch(PDOException $e) {
             echo $e->getMessage();
         }
